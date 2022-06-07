@@ -30,6 +30,7 @@ public class Flink03_State_BroadCastState {
         MapStateDescriptor<String, String> bcStateDesc = new MapStateDescriptor<>("bcState", String.class, String.class);
         // 1. 把控制流做成广播流
         BroadcastStream<String> bcStream = controlStream.broadcast(bcStateDesc);
+        
         // 2. 让数据流去connect广播流, 得到一个新的流
         BroadcastConnectedStream<String, String> stream = dataStream.connect(bcStream);
         // 3. 对新流进行处理: 把广播流中数据放入的广播状态, 数据流中的数据就可以从广播状态中读取配置信息
