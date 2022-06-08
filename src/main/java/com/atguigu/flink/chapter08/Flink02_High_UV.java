@@ -28,7 +28,7 @@ public class Flink02_High_UV {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(conf);
         env.setParallelism(1);
         // pojo  javabean
-    
+        
         env
             .readTextFile("input/UserBehavior.csv")
             .map(new MapFunction<String, UserBehavior>() {
