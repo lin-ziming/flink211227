@@ -27,6 +27,7 @@ public class Flink03_Sideout_2 {
                 public void processElement(Integer value,
                                            Context ctx,
                                            Collector<Integer> out) throws Exception {
+//                    ctx.timerService().registerProcessingTimeTimer(System.currentTimeMillis() + 1000);
                     if (value % 2 == 0) {
                         out.collect(value);
                     }else{
