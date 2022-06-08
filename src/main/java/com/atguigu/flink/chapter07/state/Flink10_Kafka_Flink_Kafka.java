@@ -55,7 +55,7 @@ public class Flink10_Kafka_Flink_Kafka {
     
         KafkaSource<String> source = KafkaSource.<String>builder()
             .setBootstrapServers("hadoop162:9092,hadoop163:9092,hadoop164:9092")
-            .setGroupId("atguigu2")
+            .setGroupId("atguigu3")
             .setTopics("s1")
             .setValueOnlyDeserializer(new SimpleStringSchema())
             .setStartingOffsets(OffsetsInitializer.latest())
