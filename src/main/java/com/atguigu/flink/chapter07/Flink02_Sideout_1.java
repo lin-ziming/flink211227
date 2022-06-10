@@ -2,7 +2,8 @@ package com.atguigu.flink.chapter07;
 
 import com.atguigu.flink.bean.WaterSensor;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -26,7 +27,12 @@ public class Flink02_Sideout_1 {
     
         SingleOutputStreamOperator<WaterSensor> main = env
             .socketTextStream("hadoop162", 9999)  // 永远是1
-            .map(new MapFunction<String, WaterSensor>() {
+            .map(new RichMapFunction<String, WaterSensor>() {
+                @Override
+                public void open(Configuration parameters) throws Exception {
+                    getRuntimeContext().getState(new ValueStateDescriptor<String>("test", String.class));
+                }
+    
                 @Override
                 public WaterSensor map(String value) throws Exception {
                     String[] data = value.split(",");
