@@ -1,17 +1,12 @@
 package com.atguigu.flink.chapter11.function;
 
 import com.atguigu.flink.bean.WaterSensor;
+import com.atguigu.flink.bean.WordLen;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.annotation.DataTypeHint;
-import org.apache.flink.table.annotation.FunctionHint;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.functions.TableFunction;
-import org.apache.flink.types.Row;
-
-import static org.apache.flink.table.api.Expressions.$;
-import static org.apache.flink.table.api.Expressions.call;
 
 /**
  * @Author lzc
@@ -39,30 +34,75 @@ public class Flink02_Table {
         
         // 1.2 先注册后使用
         tEnv.createTemporaryFunction("my_split", MySplit.class);
-        table
-            .joinLateral(call("my_split", $("id")))
+        /*table
+//            .joinLateral(call("my_split", $("id")))
+            .leftOuterJoinLateral(call("my_split", $("id")))
             .select($("id"), $("word"), $("len"))
+            .execute()
+            .print();*/
+        // 2. 在sql中使用
+        // select  ...  from a join b on a.id=b.id
+        // select  ...  from a,b where a.id=b.id
+       /* tEnv
+            .sqlQuery("select " +
+                          " id, word, len " +
+                          "from sensor " +
+                          "join lateral table( my_split(id)  ) on true")
+            .execute()
+            .print();*/
+    
+       /* tEnv
+            .sqlQuery("select " +
+                          " id, word, len " +
+                          "from sensor " +
+                          ", lateral table( my_split(id)  ) ")
+            .execute()
+            .print();*/
+    
+    
+        tEnv
+            .sqlQuery("select " +
+                          " id, w, l " +
+                          "from sensor " +
+                          "left join lateral table( my_split(id)  ) as T(w, l) on true")
             .execute()
             .print();
         
-        
-        
-        // 2. 在sql中使用
         
         
         
         
     }
     
-    @FunctionHint(output = @DataTypeHint("row<word string, len int>"))
+   /* @FunctionHint(output = @DataTypeHint("row<word string, len int>"))
     public static class MySplit extends TableFunction<Row> {
         public void eval(String s){
             if (s == null) {
                 return;
             }
+            if (s.contains("atguigu")) {
+                return;
+            }
+            
             String[] words = s.split(" ");
             for (String word : words) {
                 collect(Row.of(word, word.length()));
+            }
+        }
+    }*/
+    
+    public static class MySplit extends TableFunction<WordLen> {
+        public void eval(String s){
+            if (s == null) {
+                return;
+            }
+            if (s.contains("atguigu")) {
+                return;
+            }
+            
+            String[] words = s.split(" ");
+            for (String word : words) {
+                collect(new WordLen(word, word.length()));
             }
         }
     }
