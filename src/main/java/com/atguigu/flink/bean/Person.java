@@ -15,7 +15,6 @@ public class Person {
     private String a;
     private String b;
     private String c;
-    private String d;
     private Long ts;
     private Integer score;
 }
